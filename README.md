@@ -1,5 +1,6 @@
 Here is the complete doc set from StorageOS - https://docs.storageos.com/docs/introduction/overview
-*** This is a demo only, not recommended for use with  a live dev or prod environment ***
+
+    *** This is a demo only installation, not recommended for use in a live dev or prod environment ***
 
 First create 2 AWS t2.medium instances (I used the amazon provided free tier AMIs) on AWS,  then create a security group along with an ssh key.  Also add an EBS volume to each host (8GB will be fine for a demo)
 

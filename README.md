@@ -1,16 +1,15 @@
 Here is the complete doc set from StorageOS - https://docs.storageos.com/docs/introduction/overview
+*** This is a demo only, not recommended for use with  a live dev or prod environment ***
 
 First create 2 AWS t2.medium instances (I used the amazon provided free tier AMIs) on AWS,  then create a security group along with an ssh key.  Also add an EBS volume to each host (8GB will be fine for a demo)
 
                                         details details details
 
-ssh into both of your instances and install docker.  
+ssh into both of your instances and install docker.  (run as root or sudo each command)
 
-    $ sudo su -
     $ yum update -y
     $ yum install docker -y
     $ service docker start 
-    $ service docker enable 
     $ usermod -aG docker ec2-user
 
 Next, setup the shareable folder capability for each AWS instance - (run as root or sudo each command)
@@ -34,7 +33,7 @@ You should now be able to check the status of your swarm cluster from the first 
       ml1evr5m09gku3x7ettrctt98 *  ip-10-0-0-1     Ready   Active         Leader
       qerjcc498kx0i33oqg62mu1lk    ip-10-0-0-2     Ready   Active  
 
-Next StorageOS requires a kv store setup on each node - StorageOS currently uses Consul, (etcd and others are scheduled soon).   You can do this with compose, but since we are only dealing with 2 nodes here we're skipping the compose option.   In the examples provided below run the export commands and the docker container for consul on each node.
+Next StorageOS requires a kv store setup on each node.  StorageOS currently uses Consul, (a built in etcd is scheduled soon that would remove this need to install Consul or KV).   You could also do this step with a compose file, but since we are only dealing with 2 nodes here we're skipping the compose option.   In the examples provided below run the export commands and then run the docker container to start  consul on each node.
 
 On node one (the swarm master) set these env vars accordingly - (for AWS nodes the ip env var is the private IP, not the public IP)
 

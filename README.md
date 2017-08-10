@@ -7,24 +7,17 @@ First create 2 AWS t2.medium instances (I used the amazon AMIs) on AWS,  then cr
 ssh into your instances and get docker installed, and then create a swarm cluster using the two nodes
 
     $ sudo su -
-
     $ yum update -y
-
     $ yum install docker -y
-
     $ service docker start 
-
     $ service docker enable 
-
     $ usermod -a -G docker ec2-user
 
 
 Next setup the shareable folder capability for each node - (run as root or sudo each command)
 
     $ mount --make-shared /
-
     $ sed -i.bak -e  's:^\(\ \+\)"$unshare" -m -- nohup:\1"$unshare" -m --propagation shared -- nohup:'  /etc/init.d/docker
-
     $ service docker restart
 
 Now create your swarm cluster
@@ -35,36 +28,29 @@ take the output from your docker swarm init output to the other node and join th
 
     $ docker swarm join     --token SWMTKN-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx     <ip_addr of swarm master>:2377
 
-
 Next lets get a kv store setup on each node - StorageOS currently uses Consul, (etcd and others are scheduled soon).   You can do this     with compose, but since we are only dealing with 2 nodes here, I just ran a docker container for consul on each node
 
 On node one set these env vars accordingly - (for AWS nodes the ip env var is the private IP, not the public IP)
 
     $ export ip=10.0.0.1
-
     $ export num_nodes=2
-
     $ export leader_ip=10.0.0.1
 
 And on node 2 - note the difference is only ip
 
     $ export ip=10.0.0.2
-
     $ export num_nodes=2
-
     $ export leader_ip=10.0.0.1
 
 Then run the consul container along with these arguments
 
     $ docker run -d --name consul --net=host consul agent -server -bind=${ip} -client=0.0.0.0 -bootstrap-expect=${num_nodes} -retry-join=${leader_ip}
 
-
 Now your ready to setup StorageOS on each swarm cluster member.  You can manually go through the steps below or you can use the setup.sh from this repo
-
-*To use the setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh file to get it to run 
-
+ 
+  *To use the setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh file to get it to run 
+ 
 Each node has to have the storageos node container running.  I recommend you start by installing the StorageOS node container on the       kv leader first, then adding it to each cluster node.  Here are the details from StorageOS - https://hub.docker.com/r/storageos/node/
-
 
             * HOSTNAME: Hostname of the Docker node, only if you wish to override it.
             * ADVERTISE_IP: IP address of the Docker node, for incoming connections. Defaults to first non-loopback address.
@@ -79,7 +65,7 @@ Each node has to have the storageos node container running.  I recommend you sta
             * DFS_PORT: Port for DirectFS to listen on. Defaults to 17100.
             * LOG_LEVEL: One of debug, info, warning or error. Defaults to info.LOG_FORMAT
             * ADVERTISE_IP: On AWS, this is typically the private IP of the host. 
-+
+ 
 
     $ export HOSTNAME=$HOSTNAME
     $ export STORAGEOS_USERNAME=storageos

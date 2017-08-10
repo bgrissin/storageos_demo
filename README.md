@@ -1,6 +1,6 @@
 Here is the complete doc set from StorageOS - https://docs.storageos.com/docs/introduction/overview
 
-create 2 AWS t2.medium instances (I used the amazon AMIs) on AWS,  and create a security group along with an ssh key.  I also added an EBS volume to each host (8GB will be fine for a demo)
+Frist create 2 AWS t2.medium instances (I used the amazon AMIs) on AWS,  then create a security group along with an ssh key.  I also added an EBS volume to each host (8GB will be fine for a demo)
 
 details details details
 

@@ -2,7 +2,7 @@ Here is the complete doc set from StorageOS - https://docs.storageos.com/docs/in
 
 Frist create 2 AWS t2.medium instances (I used the amazon AMIs) on AWS,  then create a security group along with an ssh key.  I also added an EBS volume to each host (8GB will be fine for a demo)
 
-details details details
+++ details details details
 
 then ssh into your instances and get docker installed, and then create a swarm cluster using the two nodes
 

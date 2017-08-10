@@ -7,11 +7,17 @@ Frist create 2 AWS t2.medium instances (I used the amazon AMIs) on AWS,  then cr
 ssh into your instances and get docker installed, and then create a swarm cluster using the two nodes
 
 $ sudo su -
+
 $ yum update -y
+
 $ yum install docker -y
+
 $ service docker start 
+
 $ service docker enable 
+
 $ usermod -a -G docker ec2-user
+
 
 Next setup the shareable folder capability for each node - (run as root or sudo each command)
 

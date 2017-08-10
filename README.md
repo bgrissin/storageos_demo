@@ -22,7 +22,9 @@ $ usermod -a -G docker ec2-user
 Next setup the shareable folder capability for each node - (run as root or sudo each command)
 
 $ mount --make-shared /
+
 $ sed -i.bak -e  's:^\(\ \+\)"$unshare" -m -- nohup:\1"$unshare" -m --propagation shared -- nohup:'  /etc/init.d/docker
+
 $ service docker restart
 
 Now create your swarm cluster
@@ -30,8 +32,8 @@ Now create your swarm cluster
 $ docker swarm init
 
 take the output from your docker swarm init output to the other node and join that node to this master
-
 i.e.  on the
+
 $ docker swarm join     --token SWMTKN-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx     <ip_addr of swarm master>:2377
 
 
@@ -40,22 +42,22 @@ Next lets get a kv store setup on each node - StorageOS currently uses Consul, (
 On each node set these env vars accordingly - (for AWS nodes the ip env var is the private IP, not the public IP)
 
 $ export ip=10.0.0.33
+
 $ export num_nodes=2
+
 $ export leader_ip=10.0.0.33
 
 $ export ip=10.0.0.199
+
 $ export num_nodes=2
+
 $ export leader_ip=10.0.0.33
 
 Then run the consul container along with these arguments
 
-$ docker run -d --name consul --net=host consul agent -server \
-    -bind=${ip} \
-    -client=0.0.0.0 \
-    -bootstrap-expect=${num_nodes} \
-    -retry-join=${leader_ip}
+$ docker run -d --name consul --net=host consul agent -server -bind=${ip} -client=0.0.0.0 -bootstrap-expect=${num_nodes} -retry-join=${leader_ip}
 
-
++++
 Now your ready to setup StorageOS node on each swarm cluster member.  
 
 I have created a setup.sh in this repo or you can manually go through the steps below.  

@@ -27,6 +27,13 @@ take the output from your docker swarm init output provided to the other node an
 
     $ docker swarm join --token SWMTKN-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  <ip_addr of swarm master>:2377
 
+You should now be able to check the status of your swarm cluster from the first AWS node (Swarm manager) 
+
+    $ docker node ls
+      ID                           HOSTNAME       STATUS  AVAILABILITY  MANAGER STATUS
+      ml1evr5m09gku3x7ettrctt98 *  ip-10-0-0-1     Ready   Active         Leader
+      qerjcc498kx0i33oqg62mu1lk    ip-10-0-0-2     Ready   Active  
+
 Next lets get a kv store setup on each node - StorageOS currently uses Consul, (etcd and others are scheduled soon).   You can do this     with compose, but since we are only dealing with 2 nodes here. In the example below a docker container for consul is run on each node.
 
 On node one (the swarm master) set these env vars accordingly - (for AWS nodes the ip env var is the private IP, not the public IP)
@@ -44,10 +51,35 @@ And on node 2 - note the only difference is ip
 Then run the consul container along with these arguments on each AWS instance starting with the first instance (swarm manager node)
 
     $ docker run -d --name consul --net=host consul agent -server -bind=${ip} -client=0.0.0.0 -bootstrap-expect=${num_nodes} -retry-join=${leader_ip}
-    $ docker node ls
-      ID                           HOSTNAME       STATUS  AVAILABILITY  MANAGER STATUS
-      ml1evr5m09gku3x7ettrctt98 *  ip-10-0-0-1     Ready   Active         Leader
-      qerjcc498kx0i33oqg62mu1lk    ip-10-0-0-2     Ready   Active  
+    
+Also you might want to check that the consul kv service is working correctly
+    
+    $ [root@ip-10-0-0-1 ~]# curl -s http://127.0.0.1:5705/v1/health | jq
+    {
+      "submodules": {
+        "kv": {
+          "status": "alive",
+          "updatedAt": "2017-08-10T18:14:47.330371873Z",
+          "changedAt": "0001-01-01T00:00:00Z"
+        },
+        "kv_write": {
+          "status": "alive",
+          "updatedAt": "2017-08-10T18:14:47.330372774Z",
+          "changedAt": "0001-01-01T00:00:00Z"
+        },
+        "nats": {
+          "status": "alive",
+          "updatedAt": "2017-08-10T18:14:47.321208271Z",
+          "changedAt": "0001-01-01T00:00:00Z"
+        },
+        "scheduler": {
+          "status": "alive",
+          "updatedAt": "2017-08-10T18:14:47.3217479Z",
+          "changedAt": "0001-01-01T00:00:00Z"
+        }
+      }
+    }
+
 
 Now your ready to setup StorageOS on each swarm cluster member.  You can manually go through the steps below or you can use the setup.sh from this repo
  
@@ -90,6 +122,11 @@ Once your env vars are set, you can then begin to execute the storageOS installa
     $ wget -O /etc/docker/plugins/storageos.json http://docs.storageos.com/assets/storageos.json
     $ docker run -d --name storageos -e HOSTNAME --net=host --pid=host --privileged --cap-add SYS_ADMIN --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins store/storageos/node:latest server
 
+Lets take a look and check if StorageOS is connected to the Consul KV store.  Check this on each cluster node.
+
+    [root@ip-10-0-0-1 ~]# docker logs storageos 2>&1 | grep "connected"
+    time="2017-08-09T18:32:30Z" level=info msg="connected to kv store" 
+    time="2017-08-09T18:32:30Z" level=info msg="connected to store" address="10.0.0.1:8500" backend=consul 
 
 Next setup the StorageOS Docker plugin capability. Doing so will allow you create container volumes using the docker CLI versus using the              StorageOS CLI
 

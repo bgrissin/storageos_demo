@@ -59,10 +59,9 @@ Then run the consul container along with these arguments
     $ docker run -d --name consul --net=host consul agent -server -bind=${ip} -client=0.0.0.0 -bootstrap-expect=${num_nodes} -retry-join=${leader_ip}
 
 
-Now your ready to setup StorageOS node on each swarm cluster member.  I have created a setup.sh in this repo or you can manually go       through the steps below.  
+Now your ready to setup StorageOS on each swarm cluster member.  You can manually go through the steps below or you can use the setup.sh from this repo
 
-To use the setup.sh, copy the setup.sh to each of the nodes and run.  
-You may have to chmod +X setup.sh file to get it to run 
+*To use the setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh file to get it to run 
 
 Each node has to have the storageos node container running.  I recommend you start by installing the StorageOS node container on the       kv leader first, then adding it to each cluster node.  Here are the details from StorageOS - https://hub.docker.com/r/storageos/node/
 
@@ -105,7 +104,7 @@ Each node has to have the storageos node container running.  I recommend you sta
 
     $ export ADVERTISE_IP=$ip
 
-Once you env vars are set then you can begin to execute the installs
+Once you env vars are set, you can then begin to execute the storageOS installations
 
     $ sudo mkdir /var/lib/storageos
 
@@ -116,17 +115,17 @@ Once you env vars are set then you can begin to execute the installs
     $ docker run -d --name storageos -e HOSTNAME --net=host --pid=host --privileged --cap-add SYS_ADMIN --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins store/storageos/node:latest server
 
 
-Next Setup the Docker plugin capability. With this you get to create container volumes using the docker API versus using the              StorageOS APIs
+Next setup the Docker plugin capability. Doing so will allow you create container volumes using the docker CLI versus using the              StorageOS CLI
 
     $ docker plugin install --alias storageos storageos/plugin ADVERTISE_IP=${ADVERTISE_IP}
 
-Last I setup the StorageOS cli tool using a local install, as I had a bit of trouble with the container version of the CLI.  here are      those steps and instal on each node
+Last setup the StorageOS cli tool using a local install.   I had a bit of trouble with the container version of the CLI so I used the traditonal binary install steps on each node
 
     $ curl -sSL https://github.com/storageos/go-cli/releases/download/0.0.10/storageos_linux_amd64 > /usr/local/bin/storageos
 
     $ chmod +x /usr/local/bin/storageos
 
-You should be able to run the storageOS cli, test by running
+You should be able to run the storageOS cli, test by running. *make certain your $PATH includes /usr/local/bin
 
     $ storageos -v
 

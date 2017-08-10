@@ -66,42 +66,31 @@ Now your ready to setup StorageOS on each swarm cluster member.  You can manuall
 Each node has to have the storageos node container running.  I recommend you start by installing the StorageOS node container on the       kv leader first, then adding it to each cluster node.  Here are the details from StorageOS - https://hub.docker.com/r/storageos/node/
 
 
-* HOSTNAME: Hostname of the Docker node, only if you wish to override it.
-* ADVERTISE_IP: IP address of the Docker node, for incoming connections. Defaults to first non-loopback address.
-* STORAGEOS_USERNAME: Username to authenticate to the API with. Defaults to storageos.
-* STORAGEOSPASSWORD: Password to authenticate to the API with. Defaults to storageos.
-* KV_ADDR: IP address/port of the Key/Vaue store. Defaults to 127.0.0.1:8500
-* KV_BACKEND: Type of KV store to use. Defaults to consul. boltdb can be used for single node testing.
-* API_PORT: Port for the API to listen on. Defaults to 5705 (IANA Registered).
-* NATS_PORT: Port for NATS messaging to listen on. Defaults to 4222.
-* NATS_CLUSTER_PORT: Port for the NATS cluster service to listen on. Defaults to 8222.
-* SERF_PORT: Port for the Serf protocol to listen on. Defaults to 13700.
-* DFS_PORT: Port for DirectFS to listen on. Defaults to 17100.
-* LOG_LEVEL: One of debug, info, warning or error. Defaults to info.LOG_FORMAT
-* ADVERTISE_IP: On AWS, this is typically the private IP of the host. 
+            * HOSTNAME: Hostname of the Docker node, only if you wish to override it.
+            * ADVERTISE_IP: IP address of the Docker node, for incoming connections. Defaults to first non-loopback address.
+            * STORAGEOS_USERNAME: Username to authenticate to the API with. Defaults to storageos.
+            * STORAGEOSPASSWORD: Password to authenticate to the API with. Defaults to storageos.
+            * KV_ADDR: IP address/port of the Key/Vaue store. Defaults to 127.0.0.1:8500
+            * KV_BACKEND: Type of KV store to use. Defaults to consul. boltdb can be used for single node testing.
+            * API_PORT: Port for the API to listen on. Defaults to 5705 (IANA Registered).
+            * NATS_PORT: Port for NATS messaging to listen on. Defaults to 4222.
+            * NATS_CLUSTER_PORT: Port for the NATS cluster service to listen on. Defaults to 8222.
+            * SERF_PORT: Port for the Serf protocol to listen on. Defaults to 13700.
+            * DFS_PORT: Port for DirectFS to listen on. Defaults to 17100.
+            * LOG_LEVEL: One of debug, info, warning or error. Defaults to info.LOG_FORMAT
+            * ADVERTISE_IP: On AWS, this is typically the private IP of the host. 
 
     $ export HOSTNAME=$HOSTNAME
-
     $ export STORAGEOS_USERNAME=storageos
-
     $ export STORAGE_PASSWORD=storageos
-
     $ export KV_ADDR=127.0.0.1:8500
-
     $ export KV_BACKEND=consul
-
     $ export API_PORT=5705
-
     $ export NATS_PORT=4222
-
     $ export NATS_CLUSTER_PORT=8222
-
     $ export SERF_PORT=13700
-
     $ export DFS_PORT=17100
-
     $ export LOG_LEVEL=info.LOG_FORMAT
-
     $ export ADVERTISE_IP=$ip
 
 Once you env vars are set, you can then begin to execute the storageOS installations

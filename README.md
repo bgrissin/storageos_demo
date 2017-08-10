@@ -1,10 +1,10 @@
 Here is the complete doc set from StorageOS - https://docs.storageos.com/docs/introduction/overview
 
-First create 2 AWS t2.medium instances (I used the amazon AMIs) on AWS,  then create a security group along with an ssh key.  also add an EBS volume to each host (8GB will be fine for a demo)
+First create 2 AWS t2.medium instances (I used the amazon provided free tier AMIs) on AWS,  then create a security group along with an ssh key.  Also add an EBS volume to each host (8GB will be fine for a demo)
 
                                         details details details
 
-ssh into both of your instances and install docker.  Later we'll create a swarm cluster using the 2 AWS instances you just created.
+ssh into both of your instances and install docker.  
 
     $ sudo su -
     $ yum update -y
@@ -19,11 +19,11 @@ Next, setup the shareable folder capability for each AWS instance - (run as root
     $ sed -i.bak -e  's:^\(\ \+\)"$unshare" -m -- nohup:\1"$unshare" -m --propagation shared -- nohup:'  /etc/init.d/docker
     $ service docker restart
 
-Now create your swarm cluster
+Now create a swarm cluster using the 2 AWS instances you just created. On the first AWS instance run this swarm init
 
     $ docker swarm init
 
-take the output from your docker swarm init output provided to the other node and join that node to this master
+Copy the output from your docker swarm init output provided to the other node and join that node to this master
 
     $ docker swarm join --token SWMTKN-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  <ip_addr of swarm master>:2377
 
@@ -34,25 +34,23 @@ You should now be able to check the status of your swarm cluster from the first 
       ml1evr5m09gku3x7ettrctt98 *  ip-10-0-0-1     Ready   Active         Leader
       qerjcc498kx0i33oqg62mu1lk    ip-10-0-0-2     Ready   Active  
 
-Next lets get a kv store setup on each node - StorageOS currently uses Consul, (etcd and others are scheduled soon).   You can do this     with compose, but since we are only dealing with 2 nodes here. In the example below a docker container for consul is run on each node.
+Next StorageOS requires a kv store setup on each node - StorageOS currently uses Consul, (etcd and others are scheduled soon).   You can do this with compose, but since we are only dealing with 2 nodes here we're skipping the compose option.   In the examples provided below run the export commands and the docker container for consul on each node.
 
 On node one (the swarm master) set these env vars accordingly - (for AWS nodes the ip env var is the private IP, not the public IP)
 
     $ export ip=10.0.0.1
     $ export num_nodes=2
     $ export leader_ip=10.0.0.1
+    $ docker run -d --name consul --net=host consul agent -server -bind=${ip} -client=0.0.0.0 -bootstrap-expect=${num_nodes} -retry-join=${leader_ip}
 
 And on node 2 - note the only difference is ip
 
     $ export ip=10.0.0.2
     $ export num_nodes=2
     $ export leader_ip=10.0.0.1
-
-Then run the consul container along with these arguments on each AWS instance starting with the first instance (swarm manager node)
-
     $ docker run -d --name consul --net=host consul agent -server -bind=${ip} -client=0.0.0.0 -bootstrap-expect=${num_nodes} -retry-join=${leader_ip}
     
-Also you might want to check that the consul kv service is working correctly
+Also you might want to check that the consul kv service is working correctly on both cluster nodes
     
     $ [root@ip-10-0-0-1 ~]# curl -s http://127.0.0.1:5705/v1/health | jq
     {
@@ -80,12 +78,11 @@ Also you might want to check that the consul kv service is working correctly
       }
     }
 
-
-Now your ready to setup StorageOS on each swarm cluster member.  You can manually go through the steps below or you can use the setup.sh from this repo
+Now your ready to setup StorageOS on each swarm cluster node.  You can manually go through the steps below or you can use the setup.sh provided in this repo to finish the installation of StorageOS for your nodes
  
-- To use the setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh to get it to run 
+- To use setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh. 
  
-Each node has to have the storageos node container running.  It is recommended you start by installing the StorageOS node container on the       kv leader first, then adding it to each cluster node.  Here are the details from StorageOS - https://hub.docker.com/r/storageos/node/
+Each node has to have the storageos node container running.  It is recommended you start by installing the StorageOS node container on the      kv leader first, then adding it to each cluster node.  Here are the details from StorageOS - https://hub.docker.com/r/storageos/node/
 
             * HOSTNAME: Hostname of the Docker node, only if you wish to override it.
             * ADVERTISE_IP: IP address of the Docker node, for incoming connections. Defaults to first non-loopback address.
@@ -137,7 +134,7 @@ Last setup the StorageOS cli tool using a local install.
     $ curl -sSL https://github.com/storageos/go-cli/releases/download/0.0.10/storageos_linux_amd64 > /usr/local/bin/storageos
     $ chmod +x /usr/local/bin/storageos
 
-You should be able to run the storageOS cli, test by running. *make certain your $PATH includes /usr/local/bin
+You should be to test the storageOS cli by running. *make certain your $PATH includes /usr/local/bin where we curled the binary to
 
     $ storageos -v
 

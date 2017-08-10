@@ -64,7 +64,7 @@ Each node has to have the storageos node container running.  I recommend you sta
             * DFS_PORT: Port for DirectFS to listen on. Defaults to 17100.
             * LOG_LEVEL: One of debug, info, warning or error. Defaults to info.LOG_FORMAT
             * ADVERTISE_IP: On AWS, this is typically the private IP of the host. 
- .
+++
 
     $ export HOSTNAME=$HOSTNAME
     $ export STORAGEOS_USERNAME=storageos
@@ -79,25 +79,21 @@ Each node has to have the storageos node container running.  I recommend you sta
     $ export LOG_LEVEL=info.LOG_FORMAT
     $ export ADVERTISE_IP=$ip
 
-Once you env vars are set, you can then begin to execute the storageOS installations
+Once your env vars are set, you can then begin to execute the storageOS installations
 
     $ sudo mkdir /var/lib/storageos
-
     $ sudo modprobe nbd nbds_max=1024
-
     $ wget -O /etc/docker/plugins/storageos.json http://docs.storageos.com/assets/storageos.json
-
     $ docker run -d --name storageos -e HOSTNAME --net=host --pid=host --privileged --cap-add SYS_ADMIN --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins store/storageos/node:latest server
 
 
-Next setup the Docker plugin capability. Doing so will allow you create container volumes using the docker CLI versus using the              StorageOS CLI
+Next setup the StorageOS Docker plugin capability. Doing so will allow you create container volumes using the docker CLI versus using the              StorageOS CLI
 
     $ docker plugin install --alias storageos storageos/plugin ADVERTISE_IP=${ADVERTISE_IP}
 
 Last setup the StorageOS cli tool using a local install.   I had a bit of trouble with the container version of the CLI so I used the traditonal binary install steps on each node
 
     $ curl -sSL https://github.com/storageos/go-cli/releases/download/0.0.10/storageos_linux_amd64 > /usr/local/bin/storageos
-
     $ chmod +x /usr/local/bin/storageos
 
 You should be able to run the storageOS cli, test by running. *make certain your $PATH includes /usr/local/bin
@@ -115,7 +111,6 @@ So what you can do at this point is to create volumes using the StorageOS CLI or
     9e87eff13613: Pull complete 
     Digest: sha256:2605a2c4875ce5eb27a9f7403263190cd1af31e48a2044d400320548356251c4
     Status: Downloaded newer image for busybox:latest
-
 
 Here are some storageos cli docs - http://docs.storageos.com/docs/manage/volumes/
 

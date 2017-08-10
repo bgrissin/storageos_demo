@@ -79,6 +79,7 @@ Each node has to have the storageos node container running.  I recommend you sta
             * DFS_PORT: Port for DirectFS to listen on. Defaults to 17100.
             * LOG_LEVEL: One of debug, info, warning or error. Defaults to info.LOG_FORMAT
             * ADVERTISE_IP: On AWS, this is typically the private IP of the host. 
++
 
     $ export HOSTNAME=$HOSTNAME
     $ export STORAGEOS_USERNAME=storageos

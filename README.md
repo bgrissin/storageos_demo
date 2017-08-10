@@ -13,7 +13,6 @@ ssh into your instances and get docker installed, and then create a swarm cluste
     $ service docker enable 
     $ usermod -a -G docker ec2-user
 
-
 Next setup the shareable folder capability for each node - (run as root or sudo each command)
 
     $ mount --make-shared /
@@ -48,7 +47,7 @@ Then run the consul container along with these arguments
 
 Now your ready to setup StorageOS on each swarm cluster member.  You can manually go through the steps below or you can use the setup.sh from this repo
  
-  *To use the setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh file to get it to run 
+- To use the setup.sh, copy the setup.sh to each of the nodes and run.  You may have to chmod +X setup.sh file to get it to run 
  
 Each node has to have the storageos node container running.  I recommend you start by installing the StorageOS node container on the       kv leader first, then adding it to each cluster node.  Here are the details from StorageOS - https://hub.docker.com/r/storageos/node/
 
@@ -65,7 +64,7 @@ Each node has to have the storageos node container running.  I recommend you sta
             * DFS_PORT: Port for DirectFS to listen on. Defaults to 17100.
             * LOG_LEVEL: One of debug, info, warning or error. Defaults to info.LOG_FORMAT
             * ADVERTISE_IP: On AWS, this is typically the private IP of the host. 
- 
+ .
 
     $ export HOSTNAME=$HOSTNAME
     $ export STORAGEOS_USERNAME=storageos

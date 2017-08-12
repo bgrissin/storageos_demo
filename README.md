@@ -125,20 +125,20 @@ Lets take a look and check if StorageOS is connected to the Consul KV store.  Ch
     time="2017-08-09T18:32:30Z" level=info msg="connected to kv store" 
     time="2017-08-09T18:32:30Z" level=info msg="connected to store" address="10.0.0.1:8500" backend=consul 
 
-Next setup the StorageOS Docker plugin capability. Doing so will allow you create container volumes using the docker CLI versus using the              StorageOS CLI
+The next step sets up the StorageOS Docker plugin . Doing so will allow you create container volumes using the docker CLI versus using the StorageOS CLI
 
     $ docker plugin install --alias storageos storageos/plugin ADVERTISE_IP=${ADVERTISE_IP}
 
-Last setup the StorageOS cli tool using a local install. 
+An alternative to running the Docker plugin you can instead just setup the StorageOS cli tool using a local install. 
 
     $ curl -sSL https://github.com/storageos/go-cli/releases/download/0.0.10/storageos_linux_amd64 > /usr/local/bin/storageos
     $ chmod +x /usr/local/bin/storageos
 
-You should be to test the storageOS cli by running. *make certain your $PATH includes /usr/local/bin where we curled the binary to
+You should be to test the storageOS cli by running the following command. *make certain your $PATH includes /usr/local/bin where we curled the binary to
 
     $ storageos -v
 
-So what you can do at this point is to create volumes using the StorageOS CLI or via the Docker CLI.  This is what the plugin (v2)         feature provides
+So what you can do at this point is to create volumes using the StorageOS CLI or via the Docker CLI.  This is what the plugin (v2)         feature from Docker provides.
 
     $ docker volume create --driver=storageos test_volume
     test_volume
